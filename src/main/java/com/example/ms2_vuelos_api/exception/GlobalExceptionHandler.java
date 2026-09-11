@@ -39,6 +39,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
+    @ExceptionHandler(InvalidTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTransition(InvalidTransitionException ex) {
+        ErrorResponse body = new ErrorResponse("TRANSICION_ESTADO_INVALIDA", ex.getMessage(), 422, null);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body);
+    }
+
     private ErrorResponse.ErrorDetail toDetail(FieldError fe) {
         return new ErrorResponse.ErrorDetail(fe.getField(), fe.getDefaultMessage());
     }
