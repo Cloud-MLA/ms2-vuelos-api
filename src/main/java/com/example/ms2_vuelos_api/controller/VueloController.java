@@ -1,5 +1,6 @@
 package com.example.ms2_vuelos_api.controller;
 
+import com.example.ms2_vuelos_api.dto.CambioEstadoRequest;
 import com.example.ms2_vuelos_api.dto.VueloRequest;
 import com.example.ms2_vuelos_api.dto.VueloResponse;
 import com.example.ms2_vuelos_api.service.VueloService;
@@ -39,5 +40,10 @@ public class VueloController {
     @ResponseStatus(HttpStatus.CREATED)
     public VueloResponse crear(@Valid @RequestBody VueloRequest request) {
         return service.crear(request);
+    }
+
+    @PatchMapping("/{id}/estado")
+    public VueloResponse cambiarEstado(@PathVariable Integer id, @Valid @RequestBody CambioEstadoRequest request) {
+        return service.cambiarEstado(id, request.getEstado());
     }
 }

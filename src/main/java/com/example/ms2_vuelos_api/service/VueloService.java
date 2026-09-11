@@ -2,6 +2,7 @@ package com.example.ms2_vuelos_api.service;
 
 import com.example.ms2_vuelos_api.dto.VueloRequest;
 import com.example.ms2_vuelos_api.dto.VueloResponse;
+import com.example.ms2_vuelos_api.exception.InvalidTransitionException;
 import com.example.ms2_vuelos_api.exception.NotFoundException;
 import com.example.ms2_vuelos_api.model.Aerolinea;
 import com.example.ms2_vuelos_api.model.Aeronave;
@@ -68,5 +69,22 @@ public class VueloService {
         return new VueloResponse(v.getId(), v.getNumero(), v.getOrigen(), v.getDestino(),
             v.getHoraProgramada(), v.getHoraReal(), v.getEstado(), v.getTipo(),
             v.getAerolinea().getRuc(), v.getAeronave().getPlaca());
+    }
+
+    public VueloResponse cambiarEstado(Integer id, String nuevoEstado) {
+        Vuelo v = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Vuelo con id " + id + " no existe"));
+
+        if (!EstadoVueloMaquina.esTransicionValida(v.getEstado(), nuevoEstado)) {
+            throw new InvalidTransitionException(
+                    "No se puede pasar de " + v.getEstado() + " a " + nuevoEstado);
+        }
+
+        v.setEstado(nuevoEstado);
+        if (nuevoEstado.equals("Despegado")) {
+            v.setHoraReal(java.time.OffsetDateTime.now());
+        }
+        repository.save(v);
+        return toResponse(v);
     }
 }
