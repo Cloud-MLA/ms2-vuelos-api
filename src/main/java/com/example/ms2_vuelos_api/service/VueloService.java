@@ -1,5 +1,6 @@
 package com.example.ms2_vuelos_api.service;
 
+import com.example.ms2_vuelos_api.dto.VueloExistsResponse;
 import com.example.ms2_vuelos_api.dto.VueloRequest;
 import com.example.ms2_vuelos_api.dto.VueloResponse;
 import com.example.ms2_vuelos_api.exception.InvalidTransitionException;
@@ -86,5 +87,11 @@ public class VueloService {
         }
         repository.save(v);
         return toResponse(v);
+    }
+
+    public VueloExistsResponse verificarExistencia(Integer id) {
+        return repository.findById(id)
+                .map(v -> new VueloExistsResponse(true, v.getEstado()))
+                .orElseThrow(() -> new NotFoundException("Vuelo con id " + id + " no existe"));
     }
 }
