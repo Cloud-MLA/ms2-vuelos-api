@@ -1,0 +1,150 @@
+LO USADO EN LA MV-MS2-PRUEBA:
+
+
+
+(Instrucciones para cuando haya IP de base de datos más abajo)
+
+
+
+
+
+Después de subir la docker image a dockerhub (Clona el repo nomás y psuheas a tu dockerhub) y hacerle pull en la MV, crear compose y .env:
+
+
+
+
+
+
+
+
+nano docker-compose.yml    #pega el docker-compose de abajo
+nano .env                  #pega el .env de abajo
+docker compose pull
+docker compose up -d
+docker ps
+curl http://IPPUBLICA-MV:8002/actuator/health
+
+
+
+
+docker-compose.yml:
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: ms2-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - ms2_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: marianoutec/ms2-api-app:latest
+    container_name: ms2-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
+
+volumes:
+  ms2_pgdata:
+
+
+
+
+
+
+
+.env:
+
+PORT=8002
+ENV=local
+
+# PostgreSQL 16 temporal en esta misma VM
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=vuelos_db
+DB_USER=ms2_user
+DB_PASSWORD=ms2_pass
+
+
+
+
+
+
+
+
+
+
+
+(NO OLVIDAR ABRIR EL PUERTO 8002 PARA PÚBLICO (0.0.0.0)
+
+
+
+
+
+-----------------------------PARA LA BD REAL (modifica .env y quita postgres local):
+
+
+
+
+
+
+
+NUEVO .env:
+
+
+
+PORT=8002
+ENV=local
+
+DB_HOST=IP_PRIVADA_DE_LA_DB
+DB_PORT=5432
+DB_NAME=vuelos
+DB_USER=postgres
+DB_PASSWORD=la_contraseña_que_me_pase_Benja
+
+
+
+
+
+NUEVO docker-compose.yml:
+
+
+
+services:
+  app:
+    image: marianoutec/ms2-api-app:latest
+    container_name: ms2-app
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
+
+
+
+
+
+
+
+
+
+
+docker compose down -v
+docker compose up -d
+docker ps
+curl http://localhost:8002/actuator/health
