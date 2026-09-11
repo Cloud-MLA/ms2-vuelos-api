@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ms2-postgres
+    environment:
+      POSTGRES_DB: vuelos_db
+      POSTGRES_USER: ms2_user
+      POSTGRES_PASSWORD: ms2_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - ms2_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ms2_user -d vuelos_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: ms2-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8002:8002"
+    environment:
+      PORT: 8002
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: vuelos_db
+      DB_USER: ms2_user
+      DB_PASSWORD: ms2_pass
+
+volumes:
+  ms2_pgdata:
