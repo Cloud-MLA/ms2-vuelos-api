@@ -1,5 +1,12 @@
 package com.example.ms2_vuelos_api.service;
 
+import com.example.ms2_vuelos_api.dto.TripulanteResponse;
+import com.example.ms2_vuelos_api.model.OperaTripulacion;
+import com.example.ms2_vuelos_api.model.Tripulacion;
+import com.example.ms2_vuelos_api.repository.OperaTripulacionRepository;
+import com.example.ms2_vuelos_api.repository.TripulacionRepository;
+import com.example.ms2_vuelos_api.exception.ConflictException;
+import java.util.List;
 import com.example.ms2_vuelos_api.dto.VueloExistsResponse;
 import com.example.ms2_vuelos_api.dto.VueloRequest;
 import com.example.ms2_vuelos_api.dto.VueloResponse;
@@ -23,12 +30,17 @@ public class VueloService {
     private final VueloRepository repository;
     private final AerolineaRepository aerolineaRepository;
     private final AeronaveRepository aeronaveRepository;
+    private final TripulacionRepository tripulacionRepository;
+    private final OperaTripulacionRepository operaTripulacionRepository;
 
     public VueloService(VueloRepository repository, AerolineaRepository aerolineaRepository,
-                        AeronaveRepository aeronaveRepository) {
+                        AeronaveRepository aeronaveRepository, TripulacionRepository tripulacionRepository,
+                        OperaTripulacionRepository operaTripulacionRepository) {
         this.repository = repository;
         this.aerolineaRepository = aerolineaRepository;
         this.aeronaveRepository = aeronaveRepository;
+        this.tripulacionRepository = tripulacionRepository;
+        this.operaTripulacionRepository = operaTripulacionRepository;
     }
 
     public List<VueloResponse> buscar(String numero, String estado, String tipo, LocalDate fecha) {
@@ -93,5 +105,36 @@ public class VueloService {
         return repository.findById(id)
                 .map(v -> new VueloExistsResponse(true, v.getEstado()))
                 .orElseThrow(() -> new NotFoundException("Vuelo con id " + id + " no existe"));
+    }
+
+    public List<TripulanteResponse> listarTripulacion(Integer vueloId) {
+        if (!repository.existsById(vueloId)) {
+            throw new NotFoundException("Vuelo con id " + vueloId + " no existe");
+        }
+        return operaTripulacionRepository.findByVuelo_Id(vueloId).stream()
+            .map(ot -> {
+                Tripulacion t = ot.getTripulacion();
+                return new TripulanteResponse(
+                    t.getEmpleadoId(), t.getEmpleado().getNombre(),
+                    t.getEmpleado().getApellido(), t.getNumLicencia());
+            })
+            .toList();
+    }
+
+    public void asignarTripulacion(Integer vueloId, Integer empleadoId) {
+        Vuelo vuelo = repository.findById(vueloId)
+            .orElseThrow(() -> new NotFoundException("Vuelo con id " + vueloId + " no existe"));
+
+        Tripulacion tripulacion = tripulacionRepository.findById(empleadoId)
+            .orElseThrow(() -> new NotFoundException("Empleado " + empleadoId + " no es tripulación"));
+
+        if (operaTripulacionRepository.existsByVuelo_IdAndTripulacion_EmpleadoId(vueloId, empleadoId)) {
+            throw new ConflictException("El tripulante " + empleadoId + " ya está asignado a este vuelo");
+        }
+
+        OperaTripulacion ot = new OperaTripulacion();
+        ot.setVuelo(vuelo);
+        ot.setTripulacion(tripulacion);
+        operaTripulacionRepository.save(ot);
     }
 }

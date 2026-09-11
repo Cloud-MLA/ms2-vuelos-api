@@ -1,9 +1,6 @@
 package com.example.ms2_vuelos_api.controller;
 
-import com.example.ms2_vuelos_api.dto.CambioEstadoRequest;
-import com.example.ms2_vuelos_api.dto.VueloExistsResponse;
-import com.example.ms2_vuelos_api.dto.VueloRequest;
-import com.example.ms2_vuelos_api.dto.VueloResponse;
+import com.example.ms2_vuelos_api.dto.*;
 import com.example.ms2_vuelos_api.service.VueloService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -51,5 +48,16 @@ public class VueloController {
     @GetMapping("/{id}/exists")
     public VueloExistsResponse verificarExistencia(@PathVariable Integer id) {
         return service.verificarExistencia(id);
+    }
+
+    @GetMapping("/{id}/tripulacion")
+    public List<TripulanteResponse> listarTripulacion(@PathVariable Integer id) {
+        return service.listarTripulacion(id);
+    }
+
+    @PostMapping("/{id}/tripulacion")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void asignarTripulacion(@PathVariable Integer id, @Valid @RequestBody AsignarTripulacionRequest request) {
+        service.asignarTripulacion(id, request.getEmpleadoId());
     }
 }
