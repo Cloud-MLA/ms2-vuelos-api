@@ -8,95 +8,22 @@ Parte del Proyecto Parcial CS2032 — Cloud Computing (2026-2). Contexto y arqui
 
 ## Estado del proyecto
 
-Fase
-
-Tarea
-
-Estado
-
-F0
-
-MS2-01 Scaffold Spring Boot + Docker + endpoint de prueba
-
-✅
-
-F0
-
-MS2-02 Entidades JPA + migraciones Flyway (8 tablas) + E/R
-
-✅
-
-F1
-
-MS2-03 CRUD aerolíneas
-
-✅
-
-F1
-
-MS2-04 CRUD aeronaves + asientos
-
-✅
-
-F1
-
-MS2-05 CRUD vuelos + filtros combinables
-
-✅
-
-F1
-
-MS2-06 Máquina de estados (`PATCH /vuelos/{id}/estado`)
-
-✅
-
-F1
-
-MS2-07 `GET /vuelos/{id}/exists`
-
-✅
-
-F1
-
-MS2-08 Empleados + tripulación (N–M)
-
-✅
-
-F1
-
-Seed ~2,000 vuelos
-
-✅
-
-F2
-
-MS2-09 Carga masiva ≥20,000 (vuelo, asiento)
-
-⬜ Pendiente
-
-F2
-
-MS2-10 Tuning JVM t3.small
-
-✅ (ya incluido en el Dockerfile desde F0)
-
-F2
-
-MS2-11 Swagger + pruebas `@SpringBootTest`
-
-⚠️ Swagger listo, tests pendientes
-
-F2
-
-MS2-12 README + tag v1.0 → GHCR
-
-🔶 En progreso (este documento)
-
-F2
-
-DS-07 ingesta-ms2 (Postgres → CSV → S3)
-
-⬜ Bloqueado por DS-04 (bucket S3, a cargo de Benja)
+| Fase | Tarea | Estado |
+|---|---|---|
+| F0 | MS2-01 Scaffold Spring Boot + Docker + endpoint de prueba | ✅ |
+| F0 | MS2-02 Entidades JPA + migraciones Flyway (8 tablas) + E/R | ✅ |
+| F1 | MS2-03 CRUD aerolíneas | ✅ |
+| F1 | MS2-04 CRUD aeronaves + asientos | ✅ |
+| F1 | MS2-05 CRUD vuelos + filtros combinables | ✅ |
+| F1 | MS2-06 Máquina de estados (`PATCH /vuelos/{id}/estado`) | ✅ |
+| F1 | MS2-07 `GET /vuelos/{id}/exists` | ✅ |
+| F1 | MS2-08 Empleados + tripulación (N–M) | ✅ |
+| F1 | Seed ~2,000 vuelos | ✅ |
+| F2 | MS2-09 Carga masiva ≥20,000 (vuelo, asiento) | ⬜ Pendiente |
+| F2 | MS2-10 Tuning JVM t3.small | ✅ (ya incluido en el Dockerfile desde F0) |
+| F2 | MS2-11 Swagger + pruebas `@SpringBootTest` | ⚠️ Swagger listo, tests pendientes |
+| F2 | MS2-12 README + tag v1.0 → GHCR | 🔶 En progreso (este documento) |
+| F2 | DS-07 ingesta-ms2 (Postgres → CSV → S3) | ⬜ Bloqueado por DS-04 (bucket S3, a cargo de Benja) |
 
 ## Puesta en marcha (base desde la plantilla · BE-TX-02)
 
@@ -196,9 +123,9 @@ Una transición fuera de esta tabla responde `422 TRANSICION_ESTADO_INVALIDA`. A
 
 ## Convenciones
 
-- **Puerto interno:** `8002`. **Health:** `/actuator/health`.
-- **Errores:** formato común (`@RestControllerAdvice` en `exception/GlobalExceptionHandler.java`), ver [contrato de errores](https://github.com/btoroled/cloud-computing-proyecto/blob/main/docs/contratos/errores.md).
-- **Enums y rangos de ID:** [diccionario compartido](https://github.com/btoroled/cloud-computing-proyecto/blob/main/docs/contratos/enums.md) (`vuelo.id` 1–25,000).
+-   **Puerto interno:** `8002`. **Health:** `/actuator/health`.
+-   **Errores:** formato común (`@RestControllerAdvice` en `exception/GlobalExceptionHandler.java`), ver [contrato de errores](https://github.com/btoroled/cloud-computing-proyecto/blob/main/docs/contratos/errores.md).
+-   **Enums y rangos de ID:** [diccionario compartido](https://github.com/btoroled/cloud-computing-proyecto/blob/main/docs/contratos/enums.md) (`vuelo.id` 1–25,000).
 -   **Imagen:** `git tag vX.Y && git push --tags` → `ghcr.io/cloud-mla/ms2-vuelos-api:vX.Y`.
 
 ## Endpoints implementados
@@ -232,8 +159,8 @@ Una transición fuera de esta tabla responde `422 TRANSICION_ESTADO_INVALIDA`. A
 
 ## Pendientes (Fase 2)
 
-- [ ] MS2-09: generador + carga masiva ≥20,000 en `vuelo` y `asiento`
-- [ ] MS2-11: pruebas `@SpringBootTest`
-- [ ] MS2-12: tag `v1.0` y publicación en GHCR
-- [ ] DS-07: contenedor `ingesta-ms2` (Postgres → CSV → S3), bloqueado hasta que exista el bucket (DS-04, a cargo de Benja)
-- [ ] Migrar despliegue de prueba desde VM propia hacia la VM-DB oficial del equipo cuando esté lista
+-   MS2-09: generador + carga masiva ≥20,000 en `vuelo` y `asiento`
+-   MS2-11: pruebas `@SpringBootTest`
+-   MS2-12: tag `v1.0` y publicación en GHCR
+-   DS-07: contenedor `ingesta-ms2` (Postgres → CSV → S3), bloqueado hasta que exista el bucket (DS-04, a cargo de Benja)
+-   Migrar despliegue de prueba desde VM propia hacia la VM-DB oficial del equipo cuando esté lista
