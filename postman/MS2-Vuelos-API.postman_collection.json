@@ -1,0 +1,206 @@
+{
+  "info": {
+    "name": "MS2 - Vuelos / Operaciones API",
+    "description": "Coleccion de endpoints para MS2 (Java + Spring Boot + PostgreSQL). Proyecto CS2032 - Cloud Computing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://{PUBLIC-URL-MS2}:8002",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health / Docs",
+      "item": [
+        {
+          "name": "GET /actuator/health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/actuator/health"
+          }
+        },
+        {
+          "name": "GET /api/vuelos/ping",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/ping"
+          }
+        },
+        {
+          "name": "GET /v3/api-docs (OpenAPI JSON)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v3/api-docs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Aerolineas",
+      "item": [
+        {
+          "name": "GET listar aerolineas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/aerolineas"
+          }
+        },
+        {
+          "name": "GET aerolinea por RUC",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/aerolineas/20100130204"
+          }
+        },
+        {
+          "name": "POST crear aerolinea",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/vuelos/aerolineas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"20100130204\",\n  \"nombre\": \"LATAM Peru\",\n  \"alianza\": \"Oneworld\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Aeronaves",
+      "item": [
+        {
+          "name": "GET listar aeronaves",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/aeronaves"
+          }
+        },
+        {
+          "name": "GET aeronave por placa",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/aeronaves/OB-1801"
+          }
+        },
+        {
+          "name": "GET asientos de una aeronave",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/aeronaves/OB-1801/asientos"
+          }
+        },
+        {
+          "name": "POST crear aeronave",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/vuelos/aeronaves",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"OB-1801\",\n  \"modelo\": \"A320neo\",\n  \"fabricante\": \"Airbus\",\n  \"capacidad\": 180,\n  \"clase\": \"C\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vuelos",
+      "item": [
+        {
+          "name": "GET listar vuelos (sin filtros)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos"
+          }
+        },
+        {
+          "name": "GET vuelos con filtros combinados",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos?num=&estado=Programado&tipo=Nacional&fecha=2026-09-15"
+          }
+        },
+        {
+          "name": "GET vuelo por id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/1"
+          }
+        },
+        {
+          "name": "GET vuelo exists",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/1/exists"
+          }
+        },
+        {
+          "name": "POST crear vuelo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/vuelos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"LA2031\",\n  \"origen\": \"LIM\",\n  \"destino\": \"CUZ\",\n  \"horaProgramada\": \"2026-09-15T14:00:00Z\",\n  \"tipo\": \"Nacional\",\n  \"aerolineaRuc\": \"20100130204\",\n  \"aeronavePlaca\": \"OB-1801\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH cambiar estado vuelo",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/vuelos/1/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Embarcando\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empleados / Tripulacion",
+      "item": [
+        {
+          "name": "GET empleado por id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/empleados/1"
+          }
+        },
+        {
+          "name": "GET empleados por tipo",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/empleados?tipo=Tripulacion"
+          }
+        },
+        {
+          "name": "GET tripulacion de un vuelo",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/vuelos/1/tripulacion"
+          }
+        },
+        {
+          "name": "POST asignar tripulante a vuelo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/vuelos/1/tripulacion",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": 1\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
