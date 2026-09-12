@@ -34,3 +34,7 @@ dumps/
 .vscode/
 .DS_Store
 *.swp
+
+# Entorno virtual de python
+.venv/
+venv/
