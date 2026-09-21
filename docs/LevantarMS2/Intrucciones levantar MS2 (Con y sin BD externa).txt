@@ -1,20 +1,10 @@
 LO USADO EN LA MV-MS2-PRUEBA:
 
-
-
 (Instrucciones para cuando haya IP de base de datos más abajo)
 
 
-
-
-
-Después de subir la docker image a dockerhub (Clona el repo nomás y psuheas a tu dockerhub) y hacerle pull en la MV, crear compose y .env:
-
-
-
-
-
-
+Después de subir la docker image a dockerhub (clona el repo nomás y pushea a tu dockerhub)
+y hacerle pull en la MV, crear compose y .env:
 
 
 nano docker-compose.yml    #pega el docker-compose de abajo
@@ -23,8 +13,6 @@ docker compose pull
 docker compose up -d
 docker ps
 curl http://IPPUBLICA-MV:8002/actuator/health
-
-
 
 
 docker-compose.yml:
@@ -60,13 +48,19 @@ services:
     environment:
       DB_HOST: postgres
 
+  seed-ms2:
+    image: marianoutec/ms2-seed:latest
+    container_name: ms2-seed
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    profiles:
+      - seed
+
 volumes:
   ms2_pgdata:
-
-
-
-
-
 
 
 .env:
@@ -82,32 +76,26 @@ DB_USER=ms2_user
 DB_PASSWORD=ms2_pass
 
 
+(NO OLVIDAR ABRIR EL PUERTO 8002 PARA PÚBLICO (0.0.0.0))
 
 
+-----------------------------CARGAR DATOS DE PRUEBA (SEED, una sola vez):
 
+Se ejecuta como un servicio aparte (con "profile"), no queda corriendo:
 
+docker compose --profile seed run --rm seed-ms2
 
+Verificar:
 
-
-
-
-(NO OLVIDAR ABRIR EL PUERTO 8002 PARA PÚBLICO (0.0.0.0)
-
-
-
+docker exec -it ms2-postgres psql -U ms2_user -d vuelos_db -c "
+SELECT 'vuelo' AS tabla, COUNT(*) FROM vuelo
+UNION ALL SELECT 'asiento', COUNT(*) FROM asiento;
+"
 
 
 -----------------------------PARA LA BD REAL (modifica .env y quita postgres local):
 
-
-
-
-
-
-
 NUEVO .env:
-
-
 
 PORT=8002
 ENV=local
@@ -119,12 +107,7 @@ DB_USER=postgres
 DB_PASSWORD=la_contraseña_que_me_pase_Benja
 
 
-
-
-
 NUEVO docker-compose.yml:
-
-
 
 services:
   app:
@@ -135,16 +118,20 @@ services:
     env_file:
       - .env
 
-
-
-
-
-
-
-
+  seed-ms2:
+    image: marianoutec/ms2-seed:latest
+    container_name: ms2-seed
+    env_file:
+      - .env
+    profiles:
+      - seed
 
 
 docker compose down -v
 docker compose up -d
 docker ps
 curl http://localhost:8002/actuator/health
+
+Para correr el seed contra la BD real (una sola vez):
+
+docker compose --profile seed run --rm seed-ms2

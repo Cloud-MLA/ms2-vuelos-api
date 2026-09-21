@@ -32,5 +32,17 @@ services:
       DB_USER: ms2_user
       DB_PASSWORD: ms2_pass
 
+  seed-ms2:
+    build: ./seed
+    image: marianoutec/ms2-seed:latest
+    container_name: ms2-seed
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    profiles:
+      - seed
+
 volumes:
   ms2_pgdata:
