@@ -39,8 +39,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    env_file:
-      - .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: vuelos_db
+      DB_USER: ms2_user
+      DB_PASSWORD: ms2_pass
     profiles:
       - seed
 

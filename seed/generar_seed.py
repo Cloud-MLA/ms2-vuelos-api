@@ -160,6 +160,24 @@ def crear_vuelos_y_asignaciones(cur, rucs, placas, tripulantes):
     valores_vuelo = []
     valores_opera = []
 
+    def flush():
+        if valores_vuelo:
+            execute_values(
+                cur,
+                """INSERT INTO vuelo
+                   (id, numero, origen, destino, hora_programada, hora_real, estado, tipo, aerolinea_ruc, aeronave_placa)
+                   VALUES %s""",
+                valores_vuelo
+            )
+            valores_vuelo.clear()
+        if valores_opera:
+            execute_values(
+                cur,
+                "INSERT INTO opera_tripulacion (vuelo_id, tripulacion_empleado_id) VALUES %s",
+                valores_opera
+            )
+            valores_opera.clear()
+
     for vuelo_id in range(1, N_VUELOS + 1):
         tipo = random.choice(TIPOS_VUELO)
         if tipo == "Nacional":
@@ -190,38 +208,12 @@ def crear_vuelos_y_asignaciones(cur, rucs, placas, tripulantes):
         for empleado_id in asignados:
             valores_opera.append((vuelo_id, empleado_id))
 
+        # Flush sincronizado: siempre vuelo antes que opera_tripulacion,
+        # y ambos del mismo lote de vuelos juntos.
         if len(valores_vuelo) >= BATCH_SIZE:
-            execute_values(
-                cur,
-                """INSERT INTO vuelo
-                   (id, numero, origen, destino, hora_programada, hora_real, estado, tipo, aerolinea_ruc, aeronave_placa)
-                   VALUES %s""",
-                valores_vuelo
-            )
-            valores_vuelo = []
+            flush()
 
-        if len(valores_opera) >= BATCH_SIZE:
-            execute_values(
-                cur,
-                "INSERT INTO opera_tripulacion (vuelo_id, tripulacion_empleado_id) VALUES %s",
-                valores_opera
-            )
-            valores_opera = []
-
-    if valores_vuelo:
-        execute_values(
-            cur,
-            """INSERT INTO vuelo
-               (id, numero, origen, destino, hora_programada, hora_real, estado, tipo, aerolinea_ruc, aeronave_placa)
-               VALUES %s""",
-            valores_vuelo
-        )
-    if valores_opera:
-        execute_values(
-            cur,
-            "INSERT INTO opera_tripulacion (vuelo_id, tripulacion_empleado_id) VALUES %s",
-            valores_opera
-        )
+    flush()  # remanente final
 
 
 def main():
